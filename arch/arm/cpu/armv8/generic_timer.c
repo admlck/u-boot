@@ -13,6 +13,13 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+// Alternatively we could use current_el() and decide at runtime
+#ifdef CONFIG_SYS_ARCH_TIMER_VIRTUAL
+#define REG "cntvct_el0"
+#else
+#define REG "cntpct_el0"
+#endif
+
 /*
  * Generic timer implementation of get_tbclk()
  */
@@ -44,11 +51,11 @@ unsigned long timer_read_counter(void)
 	unsigned long temp;
 
 	isb();
-	asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
-	asm volatile("mrs %0, cntpct_el0" : "=r" (temp));
+	asm volatile("mrs %0, " REG : "=r" (cntpct));
+	asm volatile("mrs %0, " REG : "=r" (temp));
 	while (temp != cntpct) {
-		asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
-		asm volatile("mrs %0, cntpct_el0" : "=r" (temp));
+		asm volatile("mrs %0, " REG : "=r" (cntpct));
+		asm volatile("mrs %0, " REG : "=r" (temp));
 	}
 
 	return cntpct;
@@ -72,7 +79,7 @@ unsigned long timer_read_counter(void)
 
 	isb();
 	do {
-		asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
+		asm volatile("mrs %0, " REG : "=r" (cntpct));
 	} while (((cntpct + 1) & GENMASK(10, 0)) <= 1);
 
 	return cntpct;
@@ -86,7 +93,7 @@ unsigned long notrace timer_read_counter(void)
 	unsigned long cntpct;
 
 	isb();
-	asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
+	asm volatile("mrs %0, " REG : "=r" (cntpct));
 
 	return cntpct;
 }
