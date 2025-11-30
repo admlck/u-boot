@@ -1,0 +1,18 @@
+if ARCH_VIRT
+
+config SYS_VENDOR
+	default "virt"
+
+config TARGET_VIRT_ARM_64BIT
+	bool
+	default y
+	select ARM64
+	select BOARD_LATE_INIT
+
+config SYS_BOARD
+	default "arm"
+
+config SYS_CONFIG_NAME
+	default "virt-arm"
+
+endif
