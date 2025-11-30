@@ -1,0 +1,6 @@
+VIRT ARM BOARD
+M:	Adam Lackorzynski <adam@l4re.org>
+S:	Maintained
+F:	board/virt
+F:	include/configs/virt-arm.h
+F:	configs/virt_arm*

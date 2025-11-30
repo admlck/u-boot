@@ -1127,6 +1127,28 @@ config ARCH_QEMU
 	imply CMD_USB
 	imply POSITION_INDEPENDENT
 
+config ARCH_VIRT
+	bool "Generic Virtual Platform"
+	select DM
+	select DM_SERIAL
+	select OF_CONTROL
+	select PL01X_SERIAL
+	imply CMD_DM
+	imply DM_RNG
+	imply DM_RTC
+	imply RTC_PL031
+	imply VIDEO
+	imply VIDEO_BOCHS
+	imply SYS_WHITE_ON_BLACK
+	imply SYS_CONSOLE_IS_IN_ENV
+	imply PRE_CONSOLE_BUFFER
+	imply USB
+	imply USB_XHCI_HCD
+	imply USB_XHCI_PCI
+	imply USB_KEYBOARD
+	imply CMD_USB
+	imply POSITION_INDEPENDENT
+
 config ARCH_RENESAS
 	bool "Renesas ARM SoCs"
 	select ARCH_MISC_INIT if DISPLAY_CPUINFO && !(RZA1 || RZN1)
@@ -2383,6 +2405,8 @@ source "arch/arm/mach-mmp/Kconfig"
 
 source "arch/arm/mach-qemu/Kconfig"
 
+source "arch/arm/mach-virt/Kconfig"
+
 source "arch/arm/mach-rockchip/Kconfig"
 
 source "arch/arm/mach-s5pc1xx/Kconfig"
@@ -2481,6 +2505,7 @@ source "board/vscom/baltos/Kconfig"
 source "board/phytium/durian/Kconfig"
 source "board/phytium/pomelo/Kconfig"
 source "board/phytium/pe2201/Kconfig"
+source "board/virt/arm/Kconfig"
 source "board/xen/xenguest_arm64/Kconfig"
 
 source "arch/arm/Kconfig.debug"

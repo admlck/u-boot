@@ -1,0 +1,24 @@
+if ARCH_VIRT
+
+config SYS_VENDOR
+	default "virt"
+
+choice
+	prompt "ARM architecture"
+	default TARGET_VIRT_ARM_64BIT
+
+config TARGET_VIRT_ARM_64BIT
+	bool "ARMv8, 64bit"
+	select ARM64
+	select BOARD_LATE_INIT
+	imply SYS_ARCH_TIMER_VIRTUAL
+
+endchoice
+
+config SYS_BOARD
+	default "arm"
+
+config SYS_CONFIG_NAME
+	default "virt-arm"
+
+endif
