@@ -1,3 +1,5 @@
+if TARGET_VIRT_ARM_32BIT || TARGET_VIRT_ARM_64BIT
+
 config TEXT_BASE
 	default 0
 
@@ -10,3 +12,5 @@ config BOARD_SPECIFIC_OPTIONS # dummy
 	imply VIRTIO_PCI
 	imply VIRTIO_NET
 	imply VIRTIO_BLK
+
+endif

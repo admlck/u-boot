@@ -18,6 +18,7 @@
 
 #include <linux/sizes.h>
 
+#ifdef CONFIG_ARM64
 #include <asm/armv8/mmu.h>
 
 static struct mm_region my_mem_map[] = {
@@ -38,6 +39,7 @@ static struct mm_region my_mem_map[] = {
 };
 
 struct mm_region *mem_map = my_mem_map;
+#endif
 
 int board_late_init(void)
 {
@@ -63,6 +65,18 @@ int dram_init(void)
 {
 	if (fdtdec_setup_mem_size_base() != 0)
 		return -EINVAL;
+
+	/*
+	 * When LPAE is enabled (ARMv7),
+	 * 1:1 mapping is created using 2 MB blocks.
+	 *
+	 * In case amount of memory provided to u-boot/VM
+	 * is not multiple of 2 MB, round down the amount
+	 * of available memory to avoid hang during MMU
+	 * initialization.
+	 */
+	if (CONFIG_IS_ENABLED(ARMV7_LPAE))
+		gd->ram_size -= (gd->ram_size % 0x200000);
 
 	my_mem_map[0].virt = gd->ram_base;
 	my_mem_map[0].phys = gd->ram_base;
