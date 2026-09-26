@@ -13,6 +13,16 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+/*
+ * Size of the next transfer: up to the end of the current erase block, so
+ * that bad blocks are still skipped, but without splitting the transfer into
+ * minimal write units, which are single bytes on NOR flash.
+ */
+static size_t env_mtd_chunk(struct mtd_info *mtd, u32 offset, int remaining)
+{
+	return min_t(size_t, remaining, mtd->erasesize - offset % mtd->erasesize);
+}
+
 static int setup_mtd_device(struct mtd_info **mtd_env)
 {
 	struct mtd_info *mtd;
@@ -69,7 +79,8 @@ static int env_mtd_save(void)
 				continue;
 			}
 
-			ret = mtd_read(mtd_env, offset, mtd_env->writesize,
+			ret = mtd_read(mtd_env, offset,
+				       env_mtd_chunk(mtd_env, offset, remaining),
 				       &ret_len, tmp);
 			if (ret)
 				goto done;
@@ -117,12 +128,13 @@ static int env_mtd_save(void)
 			continue;
 		}
 
-		ret = mtd_write(mtd_env, offset, mtd_env->writesize,
+		ret = mtd_write(mtd_env, offset,
+				env_mtd_chunk(mtd_env, offset, remaining),
 				&ret_len, tmp);
 		if (ret)
 			goto done;
 
-		offset += mtd_env->writesize;
+		offset += ret_len;
 		remaining -= ret_len;
 		tmp += ret_len;
 	}
@@ -173,7 +185,8 @@ static int env_mtd_load(void)
 			continue;
 		}
 
-		ret = mtd_read(mtd_env, offset, mtd_env->writesize,
+		ret = mtd_read(mtd_env, offset,
+			       env_mtd_chunk(mtd_env, offset, remaining),
 			       &ret_len, tmp);
 		if (ret) {
 			env_set_default("mtd_read() failed", 1);
@@ -234,7 +247,8 @@ static int env_mtd_erase(void)
 				continue;
 			}
 
-			ret = mtd_read(mtd_env, offset, mtd_env->writesize,
+			ret = mtd_read(mtd_env, offset,
+				       env_mtd_chunk(mtd_env, offset, remaining),
 				       &ret_len, tmp);
 			if (ret)
 				goto done;
@@ -270,12 +284,13 @@ static int env_mtd_erase(void)
 				continue;
 			}
 
-			ret = mtd_write(mtd_env, offset, mtd_env->writesize,
+			ret = mtd_write(mtd_env, offset,
+					env_mtd_chunk(mtd_env, offset, remaining),
 					&ret_len, tmp);
 			if (ret)
 				goto done;
 
-			offset += mtd_env->writesize;
+			offset += ret_len;
 			remaining -= ret_len;
 			tmp += ret_len;
 		}
